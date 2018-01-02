@@ -18,3 +18,5 @@ download_abstracts = function(fiscalyear, destdir, name_stem = "RePORTER_PRJABS_
   }
   
 }
+
+download_abstracts(1985:2016, destdir = "/Volumes/research_data/nihexporter/abstracts/")
