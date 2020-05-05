@@ -6,7 +6,7 @@ library(stringr)
 projfile = "RePORTER_PRJ_C_FY"
 destdir = "/Volumes/Peach/nih_exporter/projects/"
 
-allproj = purrr::map_df(1985:2015, function(fyr){
+allproj = purrr::map_df(1985:2018, function(fyr){
   message("extract ", str_c(projfile, fyr, ".csv"), " from \n", str_c(destdir, projfile, fyr, ".zip"))
   if (fyr < 2012){
     readr::read_csv(unz(str_c(destdir, projfile, fyr, ".zip"), str_c(projfile, fyr, ".csv")),

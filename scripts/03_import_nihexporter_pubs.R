@@ -15,7 +15,7 @@ download_pubs = function(year, destdir, name_stem = "RePORTER_PUB_C_"){
     
     
     download.file(url = file_url,
-                  dest = paste0(destdir, "/", name_stem, i, ".zip"),
+                  destfile = paste0(destdir, name_stem, i, ".zip"),
                   mode = "wb")
     
   }
@@ -23,8 +23,8 @@ download_pubs = function(year, destdir, name_stem = "RePORTER_PUB_C_"){
 }
 
 # destdir =  "/Volumes/Peach/nih_exporter/projects/"
-destdir = "D:/nih_exporter/pubs/"
-purrr::map(1980:2017, ~ download_pubs(., destdir = destdir))
+destdir = "downloaded_data/"
+purrr::map(1980:2018, ~ download_pubs(., destdir = destdir))
 
 # Supplementary files containing affiliations
 destdir = "D:/nih_exporter/pubs/affils_supp"
@@ -51,7 +51,7 @@ purrr::map(2014:2017, ~ download_pubaffil(., destdir = destdir))
 
 # Project-Pub crosswalks
 
-destdir = "D:/nih_exporter/project_pub_xwalk/"
+destdir = "downloaded_data/pub_link"
 
 download_publink = function(year, destdir, name_stem = "RePORTER_PUBLNK_C_"){
   
@@ -72,7 +72,7 @@ download_publink = function(year, destdir, name_stem = "RePORTER_PUBLNK_C_"){
   
 }
 
-purrr::map(1980:2017, ~ download_publink(., destdir = destdir))
+purrr::map(1980:2018, ~ download_publink(., destdir = destdir))
 
 
 
