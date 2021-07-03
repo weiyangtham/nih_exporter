@@ -20,5 +20,6 @@ read_exporter_proj <- function(fyr, projfile = "RePORTER_PRJ_C_FY", destdir = "/
                     n_max = Inf)
   }
   
-  df %>% janitor::clean_names()
+  return(list(data = df %>% rename_all(str_to_lower), 
+         problems = problems(df) %>% mutate(fy = fyr)))
 }
