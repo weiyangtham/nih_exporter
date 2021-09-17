@@ -6,6 +6,8 @@ library(magrittr)
 library(httr)
 library(tictoc)
 
+source("scripts/00_functions.R")
+
 # Find all core projects with missing total cost ----
 exporter <- fst::read_fst("/Volumes/research_data/nihexporter/projects/nih_exporter_projects.fst") %>% 
   as_tibble()
