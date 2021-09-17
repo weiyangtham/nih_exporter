@@ -27,7 +27,7 @@ message("Pinging API takes a while. Uncomment if want to do it")
 #        appids_subset <- appids[k]
 #        appids_subset <- appids_subset[!is.na(appids_subset)]
 #        Sys.sleep(1.2)
-#        ask_exporter(appids_subset)})
+#        ask_reporter_for_cost(appids_subset)})
 # toc()
 # 
 # write_rds(appid_cost, here::here("data/appid-totalcost-reporterapi.rds"))
