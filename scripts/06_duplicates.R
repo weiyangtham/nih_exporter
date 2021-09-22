@@ -34,4 +34,5 @@ assertthat::assert_that(k - 1 == nrow(exporter),
                         eliminating duplicates")
 
 # exporter %>% filter(application_id == 7916889) %>% select(fy)
+
 fst::write_fst(exporter, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects.fst")
