@@ -10,7 +10,8 @@ ask_reporter <- function(appids){
   url <- "https://api.reporter.nih.gov/v1/projects/Search"
   json_body <- jsonlite::toJSON(list(criteria = list(appl_ids=appids), limit = "500"), auto_unbox = TRUE)
   res <- POST(url, body=json_body, encode='raw', add_headers('Content-Type'='application/json'))
-  results <- content(res)[[2]]
+  
+  content(res)[[2]]
   
 }
 
