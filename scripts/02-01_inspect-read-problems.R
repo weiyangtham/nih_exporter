@@ -32,14 +32,14 @@ library(magrittr)
 source("scripts/read_exporter_proj.R")
 
 # Vector of fiscal years
-file_fy = 2016:2018
+file_fy = 2016:2019
 
 # Assign each list item the FY as its name
 allproj <- file_fy %>% purrr::set_names() %>% 
   purrr::map(~read_exporter_proj(fyr = .)) 
 
 # Fiscal Year to focus on 
-problemfy = 2017
+problemfy = 2019
 
 # Extract data and problems() file for problemfy
 problemfy_output = allproj[[as.character(problemfy)]]
