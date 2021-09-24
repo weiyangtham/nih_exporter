@@ -49,8 +49,5 @@ parse_proj_dates <- function(data, datecols = c("award_notice_date", "budget_sta
   assertthat::assert_that(assertthat::are_equal(k, 0), 
                           msg = "original date and parsed date have different number of missing values")
   
-  # Replace original dates with parsed dates
-  data %>% 
-    select(-all_of(datecols)) %>% 
-    rename_at(paste0(datecols, "_parsed"), ~datecols)
+  data 
 }
