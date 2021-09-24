@@ -28,16 +28,23 @@
 library(tidyverse)
 library(magrittr)
 
+# Function for reading in zipped ExPORTER CSV files
 source("scripts/read_exporter_proj.R")
 
+# Vector of fiscal years
 file_fy = 2016:2018
-allproj <- as.character(file_fy) %>% purrr::set_names() %>% 
+
+# Assign each list item the FY as its name
+allproj <- file_fy %>% purrr::set_names() %>% 
   purrr::map(~read_exporter_proj(fyr = .)) 
 
+# Fiscal Year to focus on 
 problemfy = 2017
 
+# Extract data and problems() file for problemfy
 problemfy_output = allproj[[as.character(problemfy)]]
 
+# Row numbers of problem rows
 problemrows = problemfy_output$problems %>% pull(row) %>% unique()
 
 # Pull out "problem" rows and the row just after them for easy comparison to a row 
