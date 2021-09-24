@@ -27,7 +27,11 @@ assertthat::assert_that(all_equal(allproblems, allproblems_original),
                         msg = "parsing problems time different than parsing problems from 
                         original reading of ExPORTER files")
 
-allproj <- map_df(seq_along(file_fy), ~pluck(pluck(allproj, .), "data"))
+# allproj <- map_df(seq_along(file_fy), ~pluck(pluck(allproj, .), "data"))
+allproj = map_df(file_fy, 
+       ~{fylist = allproj[[as.character(.)]]
+       df = pluck(fylist, "data") 
+       }) 
 
 datecols = c("award_notice_date", "budget_start", "budget_end", "project_start", "project_end")
 
@@ -133,8 +137,6 @@ allproj %<>%
 #   print(oldvar)
 #   allproj %<>% mutate(!!sym(oldvar) = updatefun(newcol = !!sym(newvar), oldcol = !!sym(oldvar)))
 # }
-
-
 
 allproj %<>% select(-ends_with('update'))
 
