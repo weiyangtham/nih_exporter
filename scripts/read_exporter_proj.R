@@ -3,6 +3,9 @@
 read_exporter_proj <- function(fyr, projfile = "RePORTER_PRJ_C_FY", destdir = "/Volumes/research_data/nihexporter/projects/"){
   
   proj_filename <- str_c(projfile, fyr, ".csv")
+  if(fyr %in% 2016:2019){
+    proj_filename <- str_c(projfile, fyr, "_new", ".csv")
+  }
   
   message("extract ", str_c(projfile, fyr, ".csv"), " from \n", str_c(destdir, proj_filename))
   
