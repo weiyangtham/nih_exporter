@@ -24,8 +24,8 @@ allproblems =
 # write_rds(allproblems, here::here("data/exporter-readr-problems.rds"))
 allproblems_original = read_rds(here::here("data/exporter-readr-problems.rds"))
 assertthat::assert_that(all_equal(allproblems, allproblems_original), 
-                        msg = "parsing problems time different than parsing problems from 
-                        original reading of ExPORTER files")
+                        msg = "Parsing problems time different than parsing problems from 
+                        original reading of ExPORTER files.")
 
 # allproj <- map_df(seq_along(file_fy), ~pluck(pluck(allproj, .), "data"))
 allproj = map_df(file_fy, 
@@ -142,8 +142,10 @@ allproj %<>% select(-ends_with('update'))
 
 # Save data ----
 
-write_csv(allproj, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects.csv")
+# In hard drive
 fst::write_fst(allproj, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects.fst")
+# Locally
+fst::write_fst(allproj, here::here("data/nih_exporter_projects.fst"))
 
 # allproj file is big, keep subset on local hard drive
 # write_csv(allproj %>% filter(activity == "R01"),
