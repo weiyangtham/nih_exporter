@@ -9,7 +9,7 @@ library(tictoc)
 source("scripts/00_functions.R")
 
 # Find all core projects with missing total cost ----
-exporter <- fst::read_fst("/Volumes/research_data/nihexporter/projects/nih_exporter_projects.fst") %>% 
+exporter <- fst::read_fst(here::here("data/nih_exporter_projects.fst")) %>% 
   as_tibble()
 
 mainproj_missingcost <- exporter %>% filter(is.na(subproject_id), is.na(total_cost)) 
@@ -24,7 +24,7 @@ step <- 400
 # Ping API in batches of size `step` ----
 message("Pinging API takes a while. Uncomment if want to do it")
 # tic()
-# appid_cost <- map_df(seq(0, n, by = step), 
+# appid_cost <- map_df(seq(0, n, by = step),
 #        ~{k <- (1:step) + .
 #        appids_subset <- appids[k]
 #        appids_subset <- appids_subset[!is.na(appids_subset)]
@@ -67,4 +67,4 @@ assertthat::assert_that(
 exporter %<>% select(-total_cost_api) 
 
 fst::write_fst(exporter, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects.fst")
-  
+fst::write_fst(exporter, here::here("data/nih_exporter_projects.fst"))
