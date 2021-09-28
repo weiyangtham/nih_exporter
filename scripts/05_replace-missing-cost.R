@@ -14,25 +14,30 @@ exporter <- fst::read_fst(here::here("data/nih_exporter_projects.fst")) %>%
 
 mainproj_missingcost <- exporter %>% filter(is.na(subproject_id), is.na(total_cost)) 
 
-appids <- mainproj_missingcost$application_id
+appids <- unique(mainproj_missingcost$application_id)
 
 # Retrieve total cost for those projects from NIH RePORTER API ----
 
 n <- length(appids)
 step <- 400
+v = seq_last(0, n, by = step)
 
 # Ping API in batches of size `step` ----
 message("Pinging API takes a while. Uncomment if want to do it")
-# tic()
-# appid_cost <- map_df(seq(0, n, by = step),
-#        ~{k <- (1:step) + .
-#        appids_subset <- appids[k]
-#        appids_subset <- appids_subset[!is.na(appids_subset)]
-#        Sys.sleep(1.2)
-#        ask_reporter_for_cost(appids_subset)})
-# toc()
-# 
-# write_rds(appid_cost, here::here("data/appid-totalcost-reporterapi.rds"))
+
+appids_list = map(head(seq_along(v), -1), 
+                  ~{a = v[.] + 1
+                  b = v[. + 1] 
+                  k = seq(a, b, by = 1)
+                  appids_subset <- appids[k]
+                  ask_reporter(appids_subset)
+                  })
+
+assertthat::assert_that(length(appids_list) == (length(v) - 1), 
+                        msg = "Number of batches of records retrieved is correct")
+appid_cost = map_df(appids_list, ~extract_reporter_variable(., "award_amount"))
+
+write_rds(appid_cost, here::here("data/appid-totalcost-reporterapi.rds"))
 
 # Link application IDs back to ExPORTER and update missing total cost entries ----
 
