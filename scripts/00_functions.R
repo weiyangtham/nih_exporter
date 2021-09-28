@@ -21,7 +21,7 @@ extract_reporter_variable = function(reporter_list, var){
   map_df(reporter_list,
          ~{value = pluck(., var)
          tibble(application_id = pluck(., "appl_id"),
-                 total_cost = ifelse(is_null(value), NA, value))
+                name = ifelse(is_null(value), NA, value))
          })
 }
 
