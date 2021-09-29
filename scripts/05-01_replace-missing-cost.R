@@ -36,6 +36,7 @@ appids_list = map(head(seq_along(v), -1),
 assertthat::assert_that(length(appids_list) == (length(v) - 1), 
                         msg = "Number of batches of records retrieved is correct")
 appid_cost = map_df(appids_list, ~extract_reporter_variable(., "award_amount"))
+appid_cost %<>% rename(total_cost = name)
 
 write_rds(appid_cost, here::here("data/appid-totalcost-reporterapi.rds"))
 
@@ -45,9 +46,7 @@ appid_cost = read_rds(here::here("data/appid-totalcost-reporterapi.rds"))
 appid_cost %<>% rename(total_cost_api = total_cost)
 
 k = nrow(exporter)
-exporter = exporter %>% 
-  mutate(application_id = as.integer(application_id)) %>% 
-  left_join(appid_cost, by = "application_id") 
+exporter = exporter %>% left_join(appid_cost, by = "application_id") 
 assertthat::assert_that(k == nrow(exporter))
 
 exporter %<>%
