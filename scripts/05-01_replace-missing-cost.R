@@ -70,5 +70,5 @@ assertthat::assert_that(
 
 exporter %<>% select(-total_cost_api) 
 
-fst::write_fst(exporter, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects.fst")
-fst::write_fst(exporter, here::here("data/nih_exporter_projects.fst"))
+fst::write_fst(exporter, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects_apiupdate.fst")
+fst::write_fst(exporter, here::here("data/nih_exporter_projects_apiupdate.fst"))

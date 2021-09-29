@@ -9,7 +9,7 @@ library(tictoc)
 source("scripts/00_functions.R")
 
 # Find all core projects with missing total cost ----
-exporter <- fst::read_fst(here::here("data/nih_exporter_projects.fst")) %>% 
+exporter <- fst::read_fst(here::here("data/nih_exporter_projects_apiupdate.fst")) %>% 
   as_tibble()
 
 mainproj_missingdate <- exporter %>% filter(is.na(subproject_id), (is.na(budget_start) | is.na(budget_end))) 
@@ -93,5 +93,5 @@ assertthat::assert_that(
 
 exporter %<>% select(-c(budget_start_api, budget_end_api))
 
-# fst::write_fst(exporter, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects.fst")
-# fst::write_fst(exporter, here::here("data/nih_exporter_projects.fst"))
+# fst::write_fst(exporter, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects_apiupdate.fst")
+# fst::write_fst(exporter, here::here("data/nih_exporter_projects_apiupdate.fst"))
