@@ -147,6 +147,3 @@ fst::write_fst(allproj, "/Volumes/research_data/nihexporter/projects/nih_exporte
 # Locally
 fst::write_fst(allproj, here::here("data/nih_exporter_projects.fst"))
 
-# allproj file is big, keep subset on local hard drive
-# write_csv(allproj %>% filter(activity == "R01"),
-#           "/Users/weiyangtham/Documents/WYT Projects/nih_exporter/projects/nih_exporter_projects_r01.csv")
