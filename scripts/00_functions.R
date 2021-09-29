@@ -25,12 +25,12 @@ extract_reporter_variable = function(reporter_list, var){
          })
 }
 
-ask_reporter_for_cost = function(appids){
-  results = ask_reporter(appids)
-  map_df(results,
-         ~tibble(application_id = if_else(is_null(.$appl_id), NA_integer_, .$appl_id),
-                 total_cost = if_else(is_null(.$award_amount), NA_integer_, .$award_amount)))
-}
+# ask_reporter_for_cost = function(appids){
+#   results = ask_reporter(appids)
+#   map_df(results,
+#          ~tibble(application_id = if_else(is_null(.$appl_id), NA_integer_, .$appl_id),
+#                  total_cost = if_else(is_null(.$award_amount), NA_integer_, .$award_amount)))
+# }
 
 # seq() function but including the last value if it is not 
 # a multiple of `by` argument
