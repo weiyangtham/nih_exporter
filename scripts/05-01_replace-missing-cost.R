@@ -25,20 +25,20 @@ v = seq_last(0, n, by = step)
 # Ping API in batches of size `step` ----
 message("Pinging API takes a while. Uncomment if want to do it")
 
-appids_list = map(head(seq_along(v), -1),
-                  ~{a = v[.] + 1
-                  b = v[. + 1]
-                  k = seq(a, b, by = 1)
-                  appids_subset <- appids[k]
-                  ask_reporter(appids_subset)
-                  })
-
-assertthat::assert_that(length(appids_list) == (length(v) - 1),
-                        msg = "Number of batches of records retrieved is correct")
-appid_cost = map_df(appids_list, ~extract_reporter_variable(., "award_amount"))
-appid_cost %<>% rename(total_cost_api = name)
-
-write_rds(appid_cost, here::here("data/appid-totalcost-reporterapi.rds"))
+# appids_list = map(head(seq_along(v), -1),
+#                   ~{a = v[.] + 1
+#                   b = v[. + 1]
+#                   k = seq(a, b, by = 1)
+#                   appids_subset <- appids[k]
+#                   ask_reporter(appids_subset)
+#                   })
+# 
+# assertthat::assert_that(length(appids_list) == (length(v) - 1),
+#                         msg = "Number of batches of records retrieved is correct")
+# appid_cost = map_df(appids_list, ~extract_reporter_variable(., "award_amount"))
+# appid_cost %<>% rename(total_cost_api = name)
+# 
+# write_rds(appid_cost, here::here("data/appid-totalcost-reporterapi.rds"))
 
 # Link application IDs back to ExPORTER and update missing total cost entries ----
 
