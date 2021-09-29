@@ -37,37 +37,61 @@ assertthat::assert_that(length(appids_list) == (length(v) - 1),
                         msg = "Number of batches of records retrieved is correct")
 
 appid_budgetstart = map_df(appids_list, ~extract_reporter_variable(., "budget_start"))
+appid_budgetstart %<>% rename(budget_start_api = name)
+
 appid_budgetend = map_df(appids_list, ~extract_reporter_variable(., "budget_end"))
+appid_budgetend %<>% rename(budget_end_api = name)
+
+write_rds(appid_budgetstart, here::here("data/appid-budgetstart-reporterapi.rds"))
+write_rds(appid_budgetend, here::here("data/appid-budgetend-reporterapi.rds"))
 
 # Link application IDs back to ExPORTER and update missing total cost entries ----
 
-# appid_cost = read_rds(here::here("data/appid-totalcost-reporterapi.rds"))
-# appid_cost %<>% rename(total_cost_api = total_cost)
+appid_budgetstart = read_rds(here::here("data/appid-budgetstart-reporterapi.rds"))
+appid_budgetend = read_rds(here::here("data/appid-budgetend-reporterapi.rds"))
 
 k = nrow(exporter)
-exporter = exporter %>% left_join(appid_cost, by = "application_id") 
+exporter = exporter %>% 
+  left_join(appid_budgetstart, by = "application_id") %>% 
+  left_join(appid_budgetend, by = "application_id") 
 assertthat::assert_that(k == nrow(exporter))
 
 exporter %<>%
-  mutate(total_cost_updated  = coalesce(total_cost, total_cost_api)) 
+  mutate(across(c(budget_start_api, budget_end_api), .fns = lubridate::as_date), 
+         budget_start_updated  = coalesce(budget_start, budget_start_api), 
+         budget_end_updated  = coalesce(budget_end, budget_end_api)) 
 
+# Checks for budget_start ----
 assertthat::assert_that(
   exporter %>% 
-    filter(!is.na(total_cost), is.na(total_cost_updated)) %>% 
+    filter(!is.na(budget_start), is.na(budget_start_updated)) %>% 
     nrow() == 0,
-  msg = "If cost is not missing originally, then it should not be missing after updating"
-)
+  msg = "If cost is not missing originally, then it should not be missing after updating")
 
-updated_appids = appid_cost %>% filter(!is.na(total_cost_api)) %>% pull(application_id)
+updated_appids = appid_budgetstart %>% filter(!is.na(budget_start_api)) %>% pull(application_id)
 
 assertthat::assert_that(
   exporter %>% 
-    filter(application_id %in% updated_appids, is.na(total_cost_api)) %>% 
+    filter(application_id %in% updated_appids, is.na(budget_start_api)) %>% 
     nrow() == 0, 
-  msg = "Total cost missing for application ID that had non-missing total cost in RePORTER"
-)
+  msg = "Total cost missing for application ID that had non-missing total cost in RePORTER")
 
-exporter %<>% select(-total_cost_api) 
+# Checks for budget_end ----
+assertthat::assert_that(
+  exporter %>% 
+    filter(!is.na(budget_end), is.na(budget_end_updated)) %>% 
+    nrow() == 0,
+  msg = "If cost is not missing originally, then it should not be missing after updating")
+
+updated_appids = appid_budgetend %>% filter(!is.na(budget_end_api)) %>% pull(application_id)
+
+assertthat::assert_that(
+  exporter %>% 
+    filter(application_id %in% updated_appids, is.na(budget_end_api)) %>% 
+    nrow() == 0, 
+  msg = "Total cost missing for application ID that had non-missing total cost in RePORTER")
+
+exporter %<>% select(-c(budget_start_api, budget_end_api))
 
 # fst::write_fst(exporter, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects.fst")
 # fst::write_fst(exporter, here::here("data/nih_exporter_projects.fst"))
