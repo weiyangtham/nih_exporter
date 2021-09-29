@@ -84,9 +84,10 @@ rm(destdir)
 
 # Update Project files with supplementary files ----
 duns_00_08 = read_csv("/Volumes/research_data/nihexporter/projects/supp_files/projsupp_duns.csv",
-                      col_types = cols(.default = 'c'))
+                      col_types = cols(.default = 'c', application_id = 'i'))
 dunsfunds = read_csv("/Volumes/research_data/nihexporter/projects/supp_files/projsupp_dunsfunds.csv",
-                     col_types = cols(.default = 'c', fiscal_year = 'i',
+                     col_types = cols(.default = 'c', application_id = 'i', 
+                                      fiscal_year = 'i',
                                       total_cost = 'i', total_cost_sub_project = 'i'))
 
 # Update DUNS numbers from 2000 to 2008
