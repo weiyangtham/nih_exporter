@@ -2,7 +2,7 @@
 source("scripts/00_load-packages.R")
 source("scripts/00_functions.R")
 
-exporter <- fst::read_fst(here::here("data/nih_exporter_projects.fst")) %>% 
+exporter <- fst::read_fst(here::here("data/nih_exporter_projects_apiupdate.fst")) %>% 
   as_tibble()
 
 exporter %<>% mutate(row = row_number())
@@ -35,6 +35,6 @@ assertthat::assert_that(k - 1 == nrow(exporter),
 
 # exporter %>% filter(application_id == 7916889) %>% select(fy)
 
-fst::write_fst(exporter, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects.fst")
-fst::write_fst(exporter, here::here("data/nih_exporter_projects.fst"))
+fst::write_fst(exporter, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects_apiupdate.fst")
+fst::write_fst(exporter, here::here("data/nih_exporter_projects_apiupdate.fst"))
 
