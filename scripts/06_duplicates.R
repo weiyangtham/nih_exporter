@@ -1,4 +1,5 @@
 # Duplicate application IDs
+rm(list = ls())
 source("scripts/00_load-packages.R")
 source("scripts/00_functions.R")
 
