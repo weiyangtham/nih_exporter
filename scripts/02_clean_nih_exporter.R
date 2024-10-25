@@ -1,15 +1,15 @@
 # Unzip and bind "Project" files ----
 projfile = "RePORTER_PRJ_C_FY"
-destdir = "/Volumes/research_data/nihexporter/projects/"
+destdir = here::here("downloaded_data/2024/projects/")
 
 source("scripts/00_load-packages.R")
 source("scripts/read_exporter_proj.R")
 source("scripts/parse_proj_dates.R")
 
-file_fy <- 1985:2019
+file_fy <- 1985:2023
 
 allproj <- file_fy %>% purrr::set_names() %>% 
-  purrr::map(~read_exporter_proj(fyr = .))
+  purrr::map(~read_exporter_proj(fyr = ., destdir = destdir))
 
 allproblems = 
   map_df(file_fy, 
@@ -21,9 +21,9 @@ allproblems =
          df  = select(.data = df, fy, row, everything())}) 
 
 # Write this if first time running this code on computer
-# write_rds(allproblems, here::here("data/exporter-readr-problems.rds"))
+write_rds(allproblems, here::here("data/exporter-readr-problems.rds"))
 allproblems_original = read_rds(here::here("data/exporter-readr-problems.rds"))
-assertthat::assert_that(all_equal(allproblems, allproblems_original), 
+assertthat::assert_that(all.equal(allproblems, allproblems_original), 
                         msg = "Parsing problems time different than parsing problems from 
                         original reading of ExPORTER files.")
 
@@ -36,7 +36,14 @@ allproj = map_df(file_fy,
 datecols = c("award_notice_date", "budget_start", "budget_end", "project_start", "project_end")
 
 # Parse dates
-allproj %<>% mutate_at(vars(one_of(datecols)), list("parsed" = ~ datefun(.)))
+allproj = allproj %>% mutate_at(vars(one_of(datecols)), list("parsed" = ~ datefun(.)))
+
+# For each datecol, 
+# check that original variable and parsed variable have same missing patterns
+map_lgl(datecols, 
+    ~{v = .
+    all.equal(is.na(allproj2[[v]]), is.na(allproj2[[paste0(v, "_parsed")]]))}) %>% 
+  all()
 
 # Replace original dates with parsed dates
 allproj %<>% 
