@@ -6,27 +6,33 @@
 
 datefun = function(x){
   is_datetime = stringr::str_length(x) == 19
-  x_datetime = if_else(is_datetime, x, NA_character_)
-  x_date = if_else(!is_datetime, x, NA_character_)
+  x_datetime = if_else(is_datetime, x, NA_character_) # vector of date-times only
+  x_date = if_else(!is_datetime, x, NA_character_) # vector of dates only
   
   k1 = sum(is_datetime, na.rm = TRUE)
   k2 = sum(!is_datetime, na.rm = TRUE)
   
-  nx = sum(!is.na(x), na.rm = TRUE)
+  nx = sum(!is.na(x), na.rm = TRUE) # number of non-missing values
   
   if (k1 + k2 != nx){stop('formats do not capture all non-missing values')}
   
   if (k1 > 0 & k2 > 0){
     message("mixture of dates and date-times")
     # mixture of dates and date-times
-    x_parsed = if_else(is_datetime, lubridate::date(lubridate::ymd_hms(x_datetime)), lubridate::mdy(x_date))
+    x_parsed = case_when(is_datetime ~ lubridate::date(lubridate::ymd_hms(x_datetime)), 
+                         !is_datetime & str_detect(x_date, "\\d{4}$") ~ lubridate::mdy(x_date), 
+                         !is_datetime & str_detect(x_date, "^\\d{4}") ~ ymd(x_date))
+    
   } else if (k1 == nx & k2 == 0){
     message("date-times only")
     # this is the all are date-time case
     x_parsed = lubridate::date(lubridate::ymd_hms(x_datetime))
+    
   } else if (k1 == 0 & k2 == nx) {
     message("dates only")
-    x_parsed = lubridate::mdy(x_date)
+    x_parsed = case_when(
+      str_detect(x_date, "\\d{4}$") ~ mdy(x_date), 
+      str_detect(x_date, "^\\d{4}") ~ ymd(x_date))
   }
   x_parsed
 }
