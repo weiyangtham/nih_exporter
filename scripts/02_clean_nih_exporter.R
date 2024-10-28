@@ -40,10 +40,14 @@ allproj = allproj %>% mutate_at(vars(one_of(datecols)), list("parsed" = ~ datefu
 
 # For each datecol, 
 # check that original variable and parsed variable have same missing patterns
-map_lgl(datecols, 
+
+assertthat::assert_that(
+  map_lgl(datecols, 
     ~{v = .
-    all.equal(is.na(allproj2[[v]]), is.na(allproj2[[paste0(v, "_parsed")]]))}) %>% 
-  all()
+    all.equal(is.na(allproj[[v]]), is.na(allproj[[paste0(v, "_parsed")]]))}) %>% 
+  all(),
+  msg = "original and parsed variables have different missingness"
+)
 
 # Replace original dates with parsed dates
 allproj %<>% 
@@ -52,65 +56,34 @@ allproj %<>%
 
 rm(destdir)
 
-# Unzip and bind supplementary files ----
-# destdir = "/Volumes/Peach/nih_exporter/projects/supp_files/"
+# # Update Project files with supplementary files ----
+# duns_00_08 = read_csv("/Volumes/research_data/nihexporter/projects/supp_files/projsupp_duns.csv",
+#                       col_types = cols(.default = 'c', application_id = 'i'))
+# dunsfunds = read_csv("/Volumes/research_data/nihexporter/projects/supp_files/projsupp_dunsfunds.csv",
+#                      col_types = cols(.default = 'c', application_id = 'i', 
+#                                       fiscal_year = 'i',
+#                                       total_cost = 'i', total_cost_sub_project = 'i'))
+
+# 1985 to 1999 updates of funding amounts 
+dunsfiles = list.files("downloaded_data/2024/RePORTER_PRJFUNDING_C_FY1985_FY1999/", 
+                       full.names = T)
+dunsfunds = map_df(dunsfiles, ~read_csv(., show_col_types = FALSE)) %>%
+  janitor::clean_names()
+
+# # Update DUNS numbers from 2000 to 2008
 # 
-# projfile_duns_00_08 = "RePORTER_DUNS_C_FY"
-# duns_00_08 = purrr::map_df(2000:2008, function(fyr){
-#   message("extract ", 
-#           str_c(projfile_duns_00_08, fyr, ".csv"), " from \n", 
-#           str_c(destdir, projfile_duns_00_08, fyr, ".zip"))
-#   readr::read_csv(unz(str_c(destdir, projfile_duns_00_08, fyr, ".zip"), 
-#                       str_c(projfile_duns_00_08, fyr, ".csv")),
-#                   col_types = cols(.default = 'c'),
-#                   n_max = Inf)
-# })
+# duns_00_08 %<>% rename(org_duns_update = org_duns)
 # 
-# duns_00_08 %<>% rename_all(str_to_lower)
-
-# write_csv(duns_00_08,"/Volumes/Peach/nih_exporter/projects/supp_files/projsupp_duns.csv")
-
-# Supplementary DUNS and funding amounts from 1985 to 1999 ----
-
-# projfile_dunsfunds_85_99 = "RePORTER_PRJFUNDING_C_FY"
+# k = nrow(allproj)
+# allproj %<>% 
+#   left_join(duns_00_08, by = "application_id")
 # 
-# dunsfunds = purrr::map_df(1985:1999, function(fyr){
-#   message("extract ", 
-#           str_c(projfile_dunsfunds_85_99, fyr, ".csv"), " from \n", 
-#           str_c(destdir, projfile_dunsfunds_85_99, fyr, ".zip"))
-#   readr::read_csv(unz(str_c(destdir, projfile_dunsfunds_85_99, fyr, ".zip"), 
-#                       str_c(projfile_dunsfunds_85_99, fyr, ".csv")),
-#                   col_types = cols(.default = 'c', FY = 'i', 
-#                                    TOTAL_COST = 'i', TOTAL_COST_SUB_PROJECT = 'i'),
-#                   n_max = Inf)
-# })
+# if (k != nrow(allproj)){stop('too many obs after joining')}
+# rm(k)
 # 
-# dunsfunds %<>% rename_all(str_to_lower) %>% rename(fiscal_year = fy)
-
-# write_csv(dunsfunds,"/Volumes/Peach/nih_exporter/projects/supp_files/projsupp_dunsfunds.csv")
-
-# Update Project files with supplementary files ----
-duns_00_08 = read_csv("/Volumes/research_data/nihexporter/projects/supp_files/projsupp_duns.csv",
-                      col_types = cols(.default = 'c', application_id = 'i'))
-dunsfunds = read_csv("/Volumes/research_data/nihexporter/projects/supp_files/projsupp_dunsfunds.csv",
-                     col_types = cols(.default = 'c', application_id = 'i', 
-                                      fiscal_year = 'i',
-                                      total_cost = 'i', total_cost_sub_project = 'i'))
-
-# Update DUNS numbers from 2000 to 2008
-
-duns_00_08 %<>% rename(org_duns_update = org_duns)
-
-k = nrow(allproj)
-allproj %<>% 
-  left_join(duns_00_08, by = "application_id")
-
-if (k != nrow(allproj)){stop('too many obs after joining')}
-rm(k)
-
-allproj %<>% 
-  mutate(org_duns = if_else(!is.na(org_duns_update), org_duns_update, org_duns)) %>% 
-  select(-org_duns_update)
+# allproj %<>% 
+#   mutate(org_duns = if_else(!is.na(org_duns_update), org_duns_update, org_duns)) %>% 
+#   select(-org_duns_update)
 
 # Update DUNS and funding amounts from 1985 to 1999
 updatecols = c('funding_ics', 'org_duns', 'total_cost', 'total_cost_sub_project')
@@ -151,7 +124,7 @@ allproj %<>% select(-ends_with('update'))
 # Save data ----
 
 # In hard drive
-fst::write_fst(allproj, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects.fst")
+# fst::write_fst(allproj, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects.fst")
 # Locally
-fst::write_fst(allproj, here::here("data/nih_exporter_projects.fst"))
+fst::write_fst(allproj, here::here("data/nih_exporter_projects_1985-2023.fst"))
 
