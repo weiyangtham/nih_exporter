@@ -8,11 +8,13 @@ library(tictoc)
 
 source("scripts/00_functions.R")
 
-# Find all core projects with missing total cost ----
-exporter <- fst::read_fst(here::here("data/nih_exporter_projects_apiupdate.fst")) %>% 
+# Find all core projects with missing budget date ----
+exporter <- fst::read_fst(
+  here::here("data/nih_exporter_projects_apiupdate_1985-2023.fst")) %>% 
   as_tibble()
 
-mainproj_missingdate <- exporter %>% filter(is.na(subproject_id), (is.na(budget_start) | is.na(budget_end))) 
+mainproj_missingdate <- exporter %>%
+  filter(is.na(subproject_id), (is.na(budget_start) | is.na(budget_end))) 
 
 appids <- unique(mainproj_missingdate$application_id)
 
@@ -25,30 +27,30 @@ v = seq_last(0, n, by = step)
 # Ping API in batches of size `step` ----
 message("Pinging API takes a while. Uncomment if want to do it")
 
-# appids_list = map(head(seq_along(v), -1), 
-#                   ~{a = v[.] + 1
-#                   b = v[. + 1] 
-#                   k = seq(a, b, by = 1)
-#                   appids_subset <- appids[k]
-#                   ask_reporter(appids_subset)
-#                   })
-# 
-# assertthat::assert_that(length(appids_list) == (length(v) - 1), 
-#                         msg = "Number of batches of records retrieved is correct")
-# 
-# appid_budgetstart = map_df(appids_list, ~extract_reporter_variable(., "budget_start"))
-# appid_budgetstart %<>% rename(budget_start_api = name)
-# 
-# appid_budgetend = map_df(appids_list, ~extract_reporter_variable(., "budget_end"))
-# appid_budgetend %<>% rename(budget_end_api = name)
-# 
-# write_rds(appid_budgetstart, here::here("data/appid-budgetstart-reporterapi.rds"))
-# write_rds(appid_budgetend, here::here("data/appid-budgetend-reporterapi.rds"))
+appids_list = map(head(seq_along(v), -1),
+                  ~{a = v[.] + 1
+                  b = v[. + 1]
+                  k = seq(a, b, by = 1)
+                  appids_subset <- appids[k]
+                  ask_reporter(appids_subset)
+                  })
+
+assertthat::assert_that(length(appids_list) == (length(v) - 1),
+                        msg = "Number of batches of records retrieved is correct")
+
+appid_budgetstart = map_df(appids_list, ~extract_reporter_variable(., "budget_start"))
+appid_budgetstart %<>% rename(budget_start_api = name)
+
+appid_budgetend = map_df(appids_list, ~extract_reporter_variable(., "budget_end"))
+appid_budgetend %<>% rename(budget_end_api = name)
+
+write_rds(appid_budgetstart, here::here("data/appid-budgetstart-reporterapi_1985-2023.rds"))
+write_rds(appid_budgetend, here::here("data/appid-budgetend-reporterapi_1985-2023.rds"))
 
 # Link application IDs back to ExPORTER and update missing total cost entries ----
 
-appid_budgetstart = read_rds(here::here("data/appid-budgetstart-reporterapi.rds"))
-appid_budgetend = read_rds(here::here("data/appid-budgetend-reporterapi.rds"))
+appid_budgetstart = read_rds(here::here("data/appid-budgetstart-reporterapi_1985-2023.rds"))
+appid_budgetend = read_rds(here::here("data/appid-budgetend-reporterapi_1985-2023.rds"))
 
 k = nrow(exporter)
 exporter = exporter %>% 
@@ -95,5 +97,5 @@ exporter %<>% select(-c(budget_start, budget_end, budget_start_api, budget_end_a
 exporter %<>% rename(budget_start = budget_start_updated, 
                      budget_end = budget_end_updated)
 
-fst::write_fst(exporter, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects_apiupdate.fst")
-fst::write_fst(exporter, here::here("data/nih_exporter_projects_apiupdate.fst"))
+# fst::write_fst(exporter, "/Volumes/research_data/nihexporter/projects/nih_exporter_projects_apiupdate.fst")
+fst::write_fst(exporter, here::here("data/nih_exporter_projects_apiupdate_1985-2023.fst"))
