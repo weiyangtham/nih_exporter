@@ -5,6 +5,8 @@
 # "FY 1985-1999 Updated funding and DUNS information" data downloaded by 
 # clicking on the link at https://reporter.nih.gov/exporter
 
+source("scripts/00_load-packages.R")
+
 projfile = "RePORTER_PRJ_C_FY"
 
 csvlink = "https://reporter.nih.gov/exporter/projects/download/"
@@ -23,6 +25,11 @@ emptylist = purrr::map(1985:2023,
                            mode = "wb")
              })
 rm(emptylist)
+
+# number of files downloaded is same as number of years
+assertthat::assert_that(
+  length(list.files(here::here("downloaded_data/2024/projects/"))) == 
+                      length(1985:2023))
 
 # # Supplementary files ----
 # 
