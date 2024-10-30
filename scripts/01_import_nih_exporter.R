@@ -1,7 +1,9 @@
-# Download NIH exporter data to Wei Yang's external hard drive
-# NIH uploads corrected files with a different name, so have to 
-# loop over three different periods: 
-# 1985-1999, 2000-2008, 2009-present
+# Download NIH exporter data
+# URL used for download is in this FAQ 
+# ("What does bulk RePORTER data include for ExPORTER files?")
+
+# "FY 1985-1999 Updated funding and DUNS information" data downloaded by 
+# clicking on the link at https://reporter.nih.gov/exporter
 
 projfile = "RePORTER_PRJ_C_FY"
 
